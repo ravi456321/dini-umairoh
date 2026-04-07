@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const sections = Array.from(document.querySelectorAll('section[id]'));
   const animatedItems = Array.from(document.querySelectorAll('.ftco-animate'));
   const counters = Array.from(document.querySelectorAll('.number[data-number]'));
+  const progressBars = Array.from(document.querySelectorAll('.progress-bar[data-progress]'));
   const loader = document.getElementById('ftco-loader');
 
   function setFullHeight() {
@@ -176,6 +177,28 @@ document.addEventListener('DOMContentLoaded', () => {
     counters.forEach((counter) => observer.observe(counter));
   }
 
+  function initProgressBars() {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (!entry.isIntersecting || entry.target.dataset.animated === 'true') {
+            return;
+          }
+
+          entry.target.dataset.animated = 'true';
+          entry.target.style.width = `${entry.target.dataset.progress}%`;
+          observer.unobserve(entry.target);
+        });
+      },
+      { threshold: 0.3 },
+    );
+
+    progressBars.forEach((bar) => {
+      bar.style.width = '0%';
+      observer.observe(bar);
+    });
+  }
+
   if (navToggle && navCollapse) {
     navToggle.addEventListener('click', (event) => {
       event.preventDefault();
@@ -202,6 +225,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initSlider();
   initAnimations();
   initCounters();
+  initProgressBars();
   updateNavbarState();
 
   window.addEventListener('resize', setFullHeight);
@@ -213,4 +237,3 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 150);
 });
-

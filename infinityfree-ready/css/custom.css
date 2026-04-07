@@ -46,3 +46,7 @@
   opacity: 1;
   visibility: visible;
 }
+
+.progress-wrap .progress-bar {
+  transition: width 1.4s ease;
+}
