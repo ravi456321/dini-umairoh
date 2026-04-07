@@ -1,3 +1,5 @@
+let currentLang = 'en';
+
 document.addEventListener('DOMContentLoaded', () => {
   const nav = document.getElementById('ftco-navbar');
   const navToggle = document.querySelector('.js-fh5co-nav-toggle');
@@ -226,6 +228,8 @@ document.addEventListener('DOMContentLoaded', () => {
   initAnimations();
   initCounters();
   initProgressBars();
+  updateLanguageAttributes();
+  document.documentElement.lang = currentLang;
   updateNavbarState();
 
   window.addEventListener('resize', setFullHeight);
@@ -237,3 +241,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }, 150);
 });
+
+function updateLanguageAttributes() {
+  document.querySelectorAll('[data-placeholder-en]').forEach(el => {
+    el.placeholder = currentLang === 'en' ? el.dataset.placeholderEn : el.dataset.placeholderId;
+  });
+  document.querySelectorAll('[data-value-en]').forEach(el => {
+    el.value = currentLang === 'en' ? el.dataset.valueEn : el.dataset.valueId;
+  });
+}
+
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'id' : 'en';
+  document.getElementById('langText').textContent = currentLang === 'en' ? 'Eng' : 'Indo';
+  document.documentElement.lang = currentLang;
+  document.querySelectorAll('.text-en').forEach(el => el.style.display = currentLang === 'en' ? '' : 'none');
+  document.querySelectorAll('.text-id').forEach(el => el.style.display = currentLang === 'id' ? '' : 'none');
+  updateLanguageAttributes();
+}

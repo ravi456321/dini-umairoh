@@ -50,3 +50,23 @@
 .progress-wrap .progress-bar {
   transition: width 1.4s ease;
 }
+
+#langSwitch {
+  border-color: rgba(255, 255, 255, 0.8);
+  color: #fff !important;
+  background-color: transparent;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-size: 0.85rem;
+  padding: 0.25rem 0.9rem;
+}
+
+#langSwitch:hover,
+#langSwitch:focus {
+  background-color: rgba(255, 255, 255, 0.15);
+  color: #fff !important;
+  text-decoration: none;
+}
+
+#langSwitch:focus {
+  box-shadow: 0 0 0 0.2rem rgba(255, 255, 255, 0.3);
+}
