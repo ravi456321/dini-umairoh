@@ -1,0 +1,59 @@
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  overflow-x: hidden;
+}
+
+.home-slider-react {
+  display: block !important;
+  position: relative;
+  height: 750px;
+}
+
+.home-slider-react .slider-item {
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+  visibility: hidden;
+}
+
+.home-slider-react .slider-item.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.home-slider-react .slider-item .slider-text,
+.home-slider-react .slider-item .js-fullheight {
+  min-height: 750px;
+}
+
+.home-slider-react .owl-dots {
+  z-index: 5;
+}
+
+.home-slider-react .owl-dot {
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ftco-animate.ftco-animated {
+  opacity: 1;
+  visibility: visible;
+}
+
+.contact-image-panel {
+  background-color: rgb(46, 45, 45);
+}
+
+@media (max-width: 991.98px) {
+  .home-slider-react,
+  .home-slider-react .slider-item,
+  .home-slider-react .slider-item .slider-text,
+  .home-slider-react .slider-item .js-fullheight {
+    min-height: 100vh;
+  }
+}
