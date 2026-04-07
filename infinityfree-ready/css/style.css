@@ -8298,7 +8298,7 @@ h1, h2, h3, h4, h5,
     left: 0;
     top: 0;
     margin-top: -130px;
-    background: #000000 !important;
+    background: #1f1f1f !important;
     -webkit-box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
     box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.1);
     padding: 0 15px; }
@@ -8865,9 +8865,13 @@ h1, h2, h3, h4, h5,
     .services-1:hover .icon i {
       color: #fff; }
     .services-1:hover h3 {
-      color: #000000; }
-      .services-1:hover h3:after {
-        background: #000000; }
+      color: #fff; }
+    .services-1:hover h3 a {
+      color: #fff; }
+    .services-1:hover h3:after {
+      background: #fff; }
+    .services-1:hover .desc span {
+      color: #fff; }
 
 .progress-wrap {
   width: 100%;
@@ -9081,7 +9085,7 @@ textarea.form-control {
 
 .ftco-footer {
   font-size: 16px;
-  background: #000000;
+  background: #1f1f1f;
   padding: 7em 0;
   z-index: 0; }
   .ftco-footer .ftco-footer-logo {

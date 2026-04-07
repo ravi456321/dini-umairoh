@@ -50,3 +50,76 @@
 .progress-wrap .progress-bar {
   transition: width 1.4s ease;
 }
+
+#langSwitch {
+  border: 1.5px solid rgba(255, 255, 255, 0.6) !important;
+  color: #fff !important;
+  background-color: rgba(255, 255, 255, 0.08);
+  transition: all 0.3s ease;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.5rem 0.9rem !important;
+  letter-spacing: 0.5px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+}
+
+#langSwitch:hover {
+  background-color: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.9) !important;
+  color: #fff !important;
+  text-decoration: none;
+  transform: translateY(-2px);
+}
+
+#langSwitch:focus {
+  background-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25) !important;
+  outline: none !important;
+}
+
+body {
+  background-color: #2a2a2a;
+}
+
+.ftco-footer {
+  background: #1f1f1f;
+}
+
+/* Education Section - Purple */
+#resume-section .row > .col-md-6:nth-child(1) .resume-wrap {
+  background: rgba(139, 92, 246, 0.08);
+  padding-left: 1.5rem;
+}
+
+/* Work Experience Section - Red */
+#resume-section .row > .col-md-6:nth-child(2) .resume-wrap {
+  background: rgba(239, 68, 68, 0.08);
+  padding-left: 1.5rem;
+}
+
+/* Contact Form - Dark Theme */
+.contact-form {
+  background-color: #2d2d2d !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.contact-form .form-control {
+  background-color: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+  transition: all 0.3s ease;
+}
+
+.contact-form .form-control::placeholder {
+  color: rgba(255, 255, 255, 0.6) !important;
+}
+
+.contact-form .form-control:focus {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: #ffbd39 !important;
+  box-shadow: 0 0 0 0.25rem rgba(255, 189, 57, 0.25) !important;
+  color: #fff !important;
+}
