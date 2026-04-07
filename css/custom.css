@@ -1,0 +1,48 @@
+.logo {
+  height: 30px;
+  width: auto;
+  border-radius: 8px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.logo:hover {
+  transform: scale(1.05);
+}
+
+.home-slider {
+  position: relative;
+  overflow: hidden;
+}
+
+.home-slider .slider-item {
+  display: block !important;
+  inset: 0;
+  opacity: 0;
+  position: absolute;
+  transition: opacity 0.8s ease, visibility 0.8s ease;
+  visibility: hidden;
+}
+
+.home-slider .slider-item.is-active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.home-slider .slider-item[aria-hidden="true"] {
+  pointer-events: none;
+}
+
+.home-slider .owl-dots {
+  z-index: 5;
+}
+
+.home-slider .owl-dot {
+  border: 0;
+  cursor: pointer;
+  padding: 0;
+}
+
+.ftco-animate.ftco-animated {
+  opacity: 1;
+  visibility: visible;
+}
