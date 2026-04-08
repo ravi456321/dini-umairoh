@@ -1,6 +1,7 @@
 let currentLang = 'en';
 
 document.addEventListener('DOMContentLoaded', () => {
+  const assetVersion = window.__DINART_ASSET_VERSION__ || '20260408-01';
   const nav = document.getElementById('ftco-navbar');
   const navToggle = document.querySelector('.js-fh5co-nav-toggle');
   const navCollapse = document.getElementById('ftco-nav');
@@ -10,6 +11,202 @@ document.addEventListener('DOMContentLoaded', () => {
   const counters = Array.from(document.querySelectorAll('.number[data-number]'));
   const progressBars = Array.from(document.querySelectorAll('.progress-bar[data-progress]'));
   const loader = document.getElementById('ftco-loader');
+  const contactForm = document.getElementById('contactForm');
+  const contactStatus = document.getElementById('contactStatus');
+  const contactSubmitButton = document.getElementById('contactSubmitButton');
+  const formStartedAt = document.getElementById('formStartedAt');
+
+  function appendVersionToLocalUrl(url) {
+    if (!url) {
+      return url;
+    }
+
+    if (/^(?:[a-z]+:|\/\/|#|data:|mailto:|tel:)/i.test(url)) {
+      return url;
+    }
+
+    try {
+      const resolved = new URL(url, window.location.href);
+
+      if (resolved.origin !== window.location.origin) {
+        return url;
+      }
+
+      resolved.searchParams.set('v', assetVersion);
+      return `${resolved.pathname}${resolved.search}${resolved.hash}`;
+    } catch (error) {
+      return url;
+    }
+  }
+
+  function bustInlineBackgroundImages() {
+    document.querySelectorAll('[style*="background-image"]').forEach((element) => {
+      const backgroundImage = element.style.backgroundImage;
+
+      if (!backgroundImage || backgroundImage === 'none') {
+        return;
+      }
+
+      element.style.backgroundImage = backgroundImage.replace(
+        /url\((['"]?)(.*?)\1\)/g,
+        (match, quote, assetUrl) => `url("${appendVersionToLocalUrl(assetUrl)}")`,
+      );
+    });
+  }
+
+  function bustDirectAssetLinks() {
+    document.querySelectorAll('img[src], source[src], video[poster]').forEach((element) => {
+      if (element.hasAttribute('src')) {
+        element.setAttribute('src', appendVersionToLocalUrl(element.getAttribute('src')));
+      }
+
+      if (element.hasAttribute('poster')) {
+        element.setAttribute('poster', appendVersionToLocalUrl(element.getAttribute('poster')));
+      }
+    });
+
+    document.querySelectorAll('a[href]').forEach((element) => {
+      const href = element.getAttribute('href');
+
+      if (!href || !/\.pdf(?:$|[?#])/i.test(href)) {
+        return;
+      }
+
+      element.setAttribute('href', appendVersionToLocalUrl(href));
+    });
+
+    bustInlineBackgroundImages();
+  }
+
+  function setContactStatus(type, message) {
+    if (!contactStatus) {
+      return;
+    }
+
+    contactStatus.hidden = false;
+    contactStatus.className = `contact-form__status is-${type}`;
+    contactStatus.textContent = message;
+  }
+
+  function clearContactStatus() {
+    if (!contactStatus) {
+      return;
+    }
+
+    contactStatus.hidden = true;
+    contactStatus.className = 'contact-form__status';
+    contactStatus.textContent = '';
+  }
+
+  function setContactSubmitState(isLoading) {
+    if (!contactSubmitButton) {
+      return;
+    }
+
+    const defaultLabel = contactSubmitButton.dataset.defaultLabel || 'Send Message';
+    const loadingLabel = contactSubmitButton.dataset.loadingLabel || 'Sending...';
+
+    contactSubmitButton.disabled = isLoading;
+    contactSubmitButton.textContent = isLoading ? loadingLabel : defaultLabel;
+  }
+
+  function syncContactStartedAt() {
+    if (formStartedAt) {
+      formStartedAt.value = String(Math.floor(Date.now() / 1000));
+    }
+  }
+
+  function showContactStatusFromUrl() {
+    const url = new URL(window.location.href);
+    const status = url.searchParams.get('contact');
+
+    if (!status) {
+      return;
+    }
+
+    const messages = {
+      success: {
+        type: 'success',
+        text: 'Your message was sent successfully. A confirmation email is on the way.',
+      },
+      partial: {
+        type: 'warning',
+        text: 'Your message was sent, but the auto-reply email could not be sent.',
+      },
+      validation: {
+        type: 'error',
+        text: 'Please complete the required fields and try again.',
+      },
+      rate_limit: {
+        type: 'error',
+        text: 'Too many messages were sent recently. Please wait a few minutes and try again.',
+      },
+      error: {
+        type: 'error',
+        text: 'Sorry, something went wrong while sending your message. Please try again shortly.',
+      },
+    };
+
+    const entry = messages[status] || messages.error;
+    setContactStatus(entry.type, entry.text);
+    url.searchParams.delete('contact');
+    history.replaceState({}, document.title, `${url.pathname}${url.search}${url.hash}`);
+  }
+
+  function initContactForm() {
+    if (!contactForm) {
+      return;
+    }
+
+    syncContactStartedAt();
+    showContactStatusFromUrl();
+
+    contactForm.addEventListener('submit', async (event) => {
+      if (!window.fetch || !window.FormData) {
+        return;
+      }
+
+      event.preventDefault();
+      clearContactStatus();
+      setContactSubmitState(true);
+
+      const formData = new FormData(contactForm);
+
+      if (formStartedAt && !formData.get('form_started_at')) {
+        formData.set('form_started_at', formStartedAt.value);
+      }
+
+      try {
+        const response = await fetch(contactForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: {
+            Accept: 'application/json',
+            'X-Requested-With': 'XMLHttpRequest',
+          },
+        });
+
+        const data = await response.json().catch(() => ({
+          ok: false,
+          message: 'The server returned an unexpected response.',
+        }));
+
+        if (!response.ok || !data.ok) {
+          throw new Error(data.message || 'Unable to send your message right now.');
+        }
+
+        const statusType = data.status === 'partial' ? 'warning' : 'success';
+        setContactStatus(statusType, data.message || 'Your message was sent successfully.');
+        contactForm.reset();
+        syncContactStartedAt();
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Unable to send your message right now.';
+        setContactStatus('error', message);
+      } finally {
+        setContactSubmitState(false);
+      }
+    });
+  }
 
   function setFullHeight() {
     document.querySelectorAll('.js-fullheight').forEach((element) => {
@@ -223,6 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  bustDirectAssetLinks();
   setFullHeight();
   initSlider();
   initAnimations();
@@ -231,6 +429,7 @@ document.addEventListener('DOMContentLoaded', () => {
   updateLanguageAttributes();
   document.documentElement.lang = currentLang;
   updateNavbarState();
+  initContactForm();
 
   window.addEventListener('resize', setFullHeight);
   window.addEventListener('scroll', updateNavbarState, { passive: true });

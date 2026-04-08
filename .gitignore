@@ -4,3 +4,9 @@ dist/
 .env
 .env.local
 .env.*.local
+mail-config.php
+infinityfree-ready/mail-config.php
+storage/
+infinityfree-ready/storage/
+contact-mail.log
+infinityfree-ready/contact-mail.log

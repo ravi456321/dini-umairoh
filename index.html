@@ -5,6 +5,10 @@
 	<title>Dini Umairoh - Graphic Designer & Branding Specialist</title>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+	<meta http-equiv="Pragma" content="no-cache">
+	<meta http-equiv="Expires" content="0">
+	<meta name="build-version" content="20260408-01">
 
 	<!-- SEO Meta Tags -->
 	<meta name="description"
@@ -17,19 +21,80 @@
 	<link href="https://fonts.googleapis.com/css?family=Poppins:100,200,300,400,500,600,700,800,900" rel="stylesheet">
 
 	<!-- Stylesheets -->
-	<link rel="stylesheet" href="css/open-iconic-bootstrap.min.css?v=2">
-	<link rel="stylesheet" href="css/animate.css?v=2">
-	<link rel="stylesheet" href="css/owl.carousel.min.css?v=2">
-	<link rel="stylesheet" href="css/owl.theme.default.min.css?v=2">
-	<link rel="stylesheet" href="css/magnific-popup.css?v=2">
-	<link rel="stylesheet" href="css/aos.css?v=2">
-	<link rel="stylesheet" href="css/ionicons.min.css?v=2">
-	<link rel="stylesheet" href="css/flaticon.css?v=2">
-	<link rel="stylesheet" href="css/icomoon.css?v=2">
-	<link rel="stylesheet" href="css/style.css?v=2">
-	<link rel="stylesheet" href="css/custom.css?v=2">
-	<!-- Favicon -->
-	<link rel="icon" href="images/logo.png" type="image/png">
+	<script>
+		(function () {
+			var fallbackVersion = '20260408-01';
+			var isFileProtocol = window.location.protocol === 'file:';
+			var currentUrl = new URL(window.location.href);
+			var redirectKey = '__dinart_cache_redirect_target__';
+			var activeVersion = currentUrl.searchParams.get('__cb') || fallbackVersion;
+
+			if (!isFileProtocol) {
+				var expectedUrl = new URL(window.location.href);
+				expectedUrl.searchParams.set('__cb', activeVersion);
+
+				if (window.location.href !== expectedUrl.toString()) {
+					sessionStorage.setItem(redirectKey, expectedUrl.toString());
+					window.location.replace(expectedUrl.toString());
+					return;
+				}
+
+				if (sessionStorage.getItem(redirectKey) === window.location.href) {
+					sessionStorage.removeItem(redirectKey);
+				}
+			}
+
+			window.__DINART_ASSET_VERSION__ = activeVersion;
+
+			function clearClientCaches() {
+				if ('serviceWorker' in navigator) {
+					navigator.serviceWorker.getRegistrations().then(function (registrations) {
+						registrations.forEach(function (registration) {
+							registration.unregister();
+						});
+					}).catch(function () { });
+				}
+
+				if ('caches' in window) {
+					caches.keys().then(function (keys) {
+						return Promise.all(keys.map(function (key) {
+							return caches.delete(key);
+						}));
+					}).catch(function () { });
+				}
+			}
+
+			if (document.readyState === 'loading') {
+				document.addEventListener('DOMContentLoaded', clearClientCaches, { once: true });
+			} else {
+				clearClientCaches();
+			}
+		})();
+	</script>
+	<script>
+		(function () {
+			var version = encodeURIComponent(window.__DINART_ASSET_VERSION__ || '20260408-01');
+			var stylesheets = [
+				'css/open-iconic-bootstrap.min.css',
+				'css/animate.css',
+				'css/owl.carousel.min.css',
+				'css/owl.theme.default.min.css',
+				'css/magnific-popup.css',
+				'css/aos.css',
+				'css/ionicons.min.css',
+				'css/flaticon.css',
+				'css/icomoon.css',
+				'css/style.css',
+				'css/custom.css'
+			];
+
+			document.write(stylesheets.map(function (href) {
+				return '<link rel="stylesheet" href="' + href + '?v=' + version + '">';
+			}).join(''));
+
+			document.write('<link rel="icon" href="images/logo.png?v=' + version + '" type="image/png">');
+		})();
+	</script>
 </head>
 
 <body data-spy="scroll" data-target=".site-navbar-target" data-offset="300">
@@ -708,29 +773,37 @@
 
 			<div class="row no-gutters block-9">
 				<div class="col-md-6 order-md-last d-flex">
-					<form action="mailto:diniumai@gmail.com" method="post" enctype="text/plain"
-						class="p-4 p-md-5 contact-form">
+					<form action="contact.php" method="post" class="p-4 p-md-5 contact-form" id="contactForm"
+						accept-charset="UTF-8">
+						<div class="contact-form__status" id="contactStatus" hidden aria-live="polite"></div>
+						<input type="text" class="contact-form__trap" name="company" tabindex="-1" autocomplete="off"
+							aria-hidden="true">
+						<input type="hidden" name="form_started_at" id="formStartedAt" value="">
 						<div class="form-group">
-							<input type="text" class="form-control" name="Name" placeholder="Your Name">
+							<input type="text" class="form-control" name="name" placeholder="Your Name" maxlength="120"
+								autocomplete="name" required>
 						</div>
 						<div class="form-group">
-							<input type="email" class="form-control" name="Email" placeholder="Your Email">
+							<input type="email" class="form-control" name="email" placeholder="Your Email" maxlength="160"
+								autocomplete="email" required>
 						</div>
 						<div class="form-group">
-							<input type="text" class="form-control" name="Subject" placeholder="Subject">
+							<input type="text" class="form-control" name="subject" placeholder="Subject" maxlength="160"
+								autocomplete="off">
 						</div>
 						<div class="form-group">
-							<textarea name="Message" cols="30" rows="7" class="form-control"
-								placeholder="Message"></textarea>
+							<textarea name="message" cols="30" rows="7" class="form-control" placeholder="Message"
+								maxlength="4000" required></textarea>
 						</div>
 						<div class="form-group">
-							<input type="submit" value="Send Message" class="btn btn-primary py-3 px-5">
+							<button type="submit" class="btn btn-primary py-3 px-5" id="contactSubmitButton"
+								data-default-label="Send Message" data-loading-label="Sending...">Send Message</button>
 						</div>
 					</form>
 				</div>
 
 				<div class="col-md-6 d-flex" style='background-color: rgb(46, 45, 45);'>
-					<div class="img" style="background-image: url(images/DINI.png);"></div>
+					<div class="img" style="background-image: url(images/Contact.jpeg); background-size: contain;"></div>
 				</div>
 			</div>
 		</div>
@@ -827,10 +900,19 @@
 		</svg></div>
 
 
-	<script src="js/jquery.min.js"></script>
-	<script src="js/popper.min.js"></script>
-	<script src="js/bootstrap.min.js"></script>
-	<script src="js/site.js?v=2"></script>
+	<script>
+		(function () {
+			var version = encodeURIComponent(window.__DINART_ASSET_VERSION__ || '20260408-01');
+			[
+				'js/jquery.min.js',
+				'js/popper.min.js',
+				'js/bootstrap.min.js',
+				'js/site.js'
+			].forEach(function (src) {
+				document.write('<script src="' + src + '?v=' + version + '"><\/script>');
+			});
+		})();
+	</script>
 
 </body>
 
