@@ -16,6 +16,8 @@ return [
         'password' => 'your-app-password',
         'from_email' => 'your-gmail@gmail.com',
         'from_name' => 'Dini Umairoh Website',
+        'debug' => false,
+        'debug_log' => 'contact-smtp-debug.log',
     ],
     'security' => [
         'rate_limit_window_seconds' => 900,

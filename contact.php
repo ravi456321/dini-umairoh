@@ -72,6 +72,106 @@ function logMailError(string $message): void
     @file_put_contents(__DIR__ . '/contact-mail.log', $line, FILE_APPEND);
 }
 
+function buildMailer(
+    array $smtp,
+    string $smtpUsername,
+    string $smtpPassword,
+    string $smtpFromEmail,
+    string $smtpFromName,
+    string $host,
+    int $port,
+    string $secure
+): PHPMailer {
+    $mailer = new PHPMailer(true);
+    $mailer->isSMTP();
+    $mailer->Host = $host;
+    $mailer->SMTPAuth = true;
+    $mailer->Username = $smtpUsername;
+    $mailer->Password = $smtpPassword;
+    $mailer->SMTPSecure = $secure;
+    $mailer->Port = $port;
+    $mailer->CharSet = 'UTF-8';
+    $mailer->Timeout = 20;
+    $mailer->setFrom($smtpFromEmail, $smtpFromName);
+    $mailer->SMTPAutoTLS = true;
+    $mailer->SMTPKeepAlive = false;
+
+    if (!empty($smtp['debug']) && !empty($smtp['debug_log'])) {
+        $debugLogPath = __DIR__ . '/' . ltrim((string) $smtp['debug_log'], '/\\');
+        $mailer->SMTPDebug = 2;
+        $mailer->Debugoutput = static function (string $message, int $level) use ($debugLogPath): void {
+            $line = sprintf("[%s] SMTP[%d] %s\n", date('c'), $level, trim($message));
+            @file_put_contents($debugLogPath, $line, FILE_APPEND);
+        };
+    }
+
+    return $mailer;
+}
+
+function sendViaConfiguredSmtp(
+    callable $configureMessage,
+    array $smtp,
+    string $smtpUsername,
+    string $smtpPassword,
+    string $smtpFromEmail,
+    string $smtpFromName,
+    string $logPrefix
+): void {
+    $host = trim((string) ($smtp['host'] ?? 'smtp.gmail.com'));
+    $attempts = [];
+    $configuredPort = (int) ($smtp['port'] ?? 587);
+    $configuredSecure = trim((string) ($smtp['secure'] ?? 'tls'));
+
+    if ($configuredPort > 0 && $configuredSecure !== '') {
+        $attempts[] = [$host, $configuredPort, $configuredSecure];
+    }
+
+    $fallbacks = [
+        [$host, 587, 'tls'],
+        [$host, 465, 'ssl'],
+    ];
+
+    foreach ($fallbacks as $fallback) {
+        $alreadyQueued = false;
+        foreach ($attempts as $attempt) {
+            if ($attempt[0] === $fallback[0] && $attempt[1] === $fallback[1] && $attempt[2] === $fallback[2]) {
+                $alreadyQueued = true;
+                break;
+            }
+        }
+
+        if (!$alreadyQueued) {
+            $attempts[] = $fallback;
+        }
+    }
+
+    $errors = [];
+
+    foreach ($attempts as [$attemptHost, $attemptPort, $attemptSecure]) {
+        try {
+            $mailer = buildMailer(
+                $smtp,
+                $smtpUsername,
+                $smtpPassword,
+                $smtpFromEmail,
+                $smtpFromName,
+                $attemptHost,
+                $attemptPort,
+                $attemptSecure
+            );
+
+            $configureMessage($mailer);
+            $mailer->send();
+            return;
+        } catch (Exception $exception) {
+            $errors[] = sprintf('%s:%d/%s -> %s', $attemptHost, $attemptPort, $attemptSecure, $exception->getMessage());
+        }
+    }
+
+    logMailError($logPrefix . ' failed. Attempts: ' . implode(' | ', $errors));
+    throw new Exception($logPrefix . ' failed.');
+}
+
 function enforceRateLimit(array $config): void
 {
     $security = $config['security'] ?? [];
@@ -218,52 +318,46 @@ $replyAlt = "Thank you for reaching out, {$name}.\n\n"
     . "Warm regards,\nDini Umairoh\n{$publicEmail}\n";
 
 try {
-    $ownerMailer = new PHPMailer(true);
-    $ownerMailer->isSMTP();
-    $ownerMailer->Host = (string) $smtp['host'];
-    $ownerMailer->SMTPAuth = true;
-    $ownerMailer->Username = $smtpUsername;
-    $ownerMailer->Password = $smtpPassword;
-    $ownerMailer->SMTPSecure = (string) $smtp['secure'];
-    $ownerMailer->Port = (int) $smtp['port'];
-    $ownerMailer->CharSet = 'UTF-8';
-    $ownerMailer->Timeout = 20;
-    $ownerMailer->setFrom($smtpFromEmail, $smtpFromName);
-    $ownerMailer->addAddress($notificationEmail, $notificationName);
-    $ownerMailer->addReplyTo($email, $name);
-    $ownerMailer->isHTML(true);
-    $ownerMailer->Subject = 'New portfolio inquiry: ' . $subject;
-    $ownerMailer->Body = $ownerHtml;
-    $ownerMailer->AltBody = $ownerAlt;
-    $ownerMailer->send();
+    sendViaConfiguredSmtp(
+        static function (PHPMailer $ownerMailer) use ($notificationEmail, $notificationName, $email, $name, $subject, $ownerHtml, $ownerAlt): void {
+            $ownerMailer->addAddress($notificationEmail, $notificationName);
+            $ownerMailer->addReplyTo($email, $name);
+            $ownerMailer->isHTML(true);
+            $ownerMailer->Subject = 'New portfolio inquiry: ' . $subject;
+            $ownerMailer->Body = $ownerHtml;
+            $ownerMailer->AltBody = $ownerAlt;
+        },
+        $smtp,
+        $smtpUsername,
+        $smtpPassword,
+        $smtpFromEmail,
+        $smtpFromName,
+        'Owner mail'
+    );
 } catch (Exception $exception) {
-    logMailError('Owner mail failed: ' . $exception->getMessage());
     respond(false, 'error', 'Sorry, the message could not be sent right now. Please try again shortly.', 500);
 }
 
 try {
-    $replyMailer = new PHPMailer(true);
-    $replyMailer->isSMTP();
-    $replyMailer->Host = (string) $smtp['host'];
-    $replyMailer->SMTPAuth = true;
-    $replyMailer->Username = $smtpUsername;
-    $replyMailer->Password = $smtpPassword;
-    $replyMailer->SMTPSecure = (string) $smtp['secure'];
-    $replyMailer->Port = (int) $smtp['port'];
-    $replyMailer->CharSet = 'UTF-8';
-    $replyMailer->Timeout = 20;
-    $replyMailer->setFrom($smtpFromEmail, $smtpFromName);
-    $replyMailer->addAddress($email, $name);
-    if ($publicEmail !== '') {
-        $replyMailer->addReplyTo($publicEmail, $notificationName);
-    }
-    $replyMailer->isHTML(true);
-    $replyMailer->Subject = 'Thanks for contacting Dini Umairoh';
-    $replyMailer->Body = $replyHtml;
-    $replyMailer->AltBody = $replyAlt;
-    $replyMailer->send();
+    sendViaConfiguredSmtp(
+        static function (PHPMailer $replyMailer) use ($email, $name, $publicEmail, $notificationName, $replyHtml, $replyAlt): void {
+            $replyMailer->addAddress($email, $name);
+            if ($publicEmail !== '') {
+                $replyMailer->addReplyTo($publicEmail, $notificationName);
+            }
+            $replyMailer->isHTML(true);
+            $replyMailer->Subject = 'Thanks for contacting Dini Umairoh';
+            $replyMailer->Body = $replyHtml;
+            $replyMailer->AltBody = $replyAlt;
+        },
+        $smtp,
+        $smtpUsername,
+        $smtpPassword,
+        $smtpFromEmail,
+        $smtpFromName,
+        'Auto-reply mail'
+    );
 } catch (Exception $exception) {
-    logMailError('Auto-reply failed: ' . $exception->getMessage());
     respond(true, 'partial', 'Your message was sent successfully, but the confirmation email could not be delivered.');
 }
 
