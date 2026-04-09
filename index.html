@@ -101,16 +101,19 @@
 
 
 	<nav class="navbar navbar-expand-lg navbar-dark ftco_navbar ftco-navbar-light site-navbar-target" id="ftco-navbar">
-		<div class="container">
-			<a class="navbar-brand text-center" href="index.html"><img class="logo" src="images/logo.png"><span>Dini
-					Umairoh</span> </a>
+		<div class="container navbar-shell">
+			<a class="navbar-brand brand-lockup" href="index.html" aria-label="Dini Umairoh home">
+				<img class="logo" src="images/logo.png" alt="Dini Umairoh logo">
+				<span class="brand-wordmark">DINI UMAIROH</span>
+			</a>
+
 			<button class="navbar-toggler js-fh5co-nav-toggle fh5co-nav-toggle" type="button" data-toggle="collapse"
 				data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="oi oi-menu"></span> Menu
 			</button>
 
 			<div class="collapse navbar-collapse" id="ftco-nav">
-				<ul class="navbar-nav nav ml-auto">
+				<ul class="navbar-nav nav navbar-links-row">
 					<li class="nav-item"><a href="#about-section" class="nav-link"><span><span
 									class="text-en">About</span><span class="text-id"
 									style="display:none">Tentang</span></span></a></li>
@@ -126,21 +129,19 @@
 					<li class="nav-item"><a href="#projects-section" class="nav-link"><span><span
 									class="text-en">Projects</span><span class="text-id"
 									style="display:none">Proyek</span></span></a></li>
-					<li class="nav-item"><a href="#blog-section" class="nav-link"><span><span class="text-en">My
-									Blog</span><span class="text-id" style="display:none">Blog Saya</span></span></a>
+					<li class="nav-item"><a href="#blog-section" class="nav-link"><span><span class="text-en">My Blog</span><span class="text-id" style="display:none">Blog Saya</span></span></a>
 					</li>
 					<li class="nav-item"><a href="#contact-section" class="nav-link"><span><span
 									class="text-en">Contact</span><span class="text-id"
 									style="display:none">Kontak</span></span></a></li>
-					<li class="nav-item" style="
-    display: flex;
-    align-items: center;
-    justify-content: center;
-">
-						<a class="nav-link btn btn-outline-light btn-sm rounded-pill" href="#" id="langSwitch"
-							onclick="toggleLanguage()"><span id="langText">Eng</span></a>
-					</li>
 				</ul>
+			</div>
+
+			<div class="lang-switcher navbar-lang-switcher" role="group" aria-label="Language switcher">
+				<button class="lang-chip is-active" id="langEn" type="button" onclick="setLanguage('en')"
+					aria-pressed="true">ENG</button>
+				<button class="lang-chip" id="langId" type="button" onclick="setLanguage('id')"
+					aria-pressed="false">IND</button>
 			</div>
 		</div>
 	</nav>
@@ -403,7 +404,7 @@
 							komunikasi pendidikan.</span></p>
 				</div>
 			</div>
-			<div class="row">
+			<div class="row services-grid">
 				<div class="col-md-4 text-center d-flex ftco-animate">
 					<div class="services-1">
 						<span class="icon">
@@ -815,7 +816,7 @@
 					</form>
 				</div>
 
-				<div class="col-md-6 d-flex" style='background-color: rgb(46, 45, 45);'>
+				<div class="col-md-6 d-flex">
 					<div class="img" style="background-image: url(images/Contact.jpeg); background-size: cover; background-position: center"></div>
 				</div>
 			</div>

@@ -426,8 +426,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initAnimations();
   initCounters();
   initProgressBars();
-  updateLanguageAttributes();
-  document.documentElement.lang = currentLang;
+  applyLanguage();
   updateNavbarState();
   initContactForm();
 
@@ -450,11 +449,41 @@ function updateLanguageAttributes() {
   });
 }
 
-function toggleLanguage() {
-  currentLang = currentLang === 'en' ? 'id' : 'en';
-  document.getElementById('langText').textContent = currentLang === 'en' ? 'Eng' : 'Indo';
+function updateLanguageSwitcher() {
+  const langEn = document.getElementById('langEn');
+  const langId = document.getElementById('langId');
+
+  if (langEn) {
+    const isActive = currentLang === 'en';
+    langEn.classList.toggle('is-active', isActive);
+    langEn.setAttribute('aria-pressed', String(isActive));
+  }
+
+  if (langId) {
+    const isActive = currentLang === 'id';
+    langId.classList.toggle('is-active', isActive);
+    langId.setAttribute('aria-pressed', String(isActive));
+  }
+}
+
+function applyLanguage() {
   document.documentElement.lang = currentLang;
   document.querySelectorAll('.text-en').forEach(el => el.style.display = currentLang === 'en' ? '' : 'none');
   document.querySelectorAll('.text-id').forEach(el => el.style.display = currentLang === 'id' ? '' : 'none');
   updateLanguageAttributes();
+  updateLanguageSwitcher();
+}
+
+function setLanguage(language) {
+  if (language !== 'en' && language !== 'id') {
+    return;
+  }
+
+  currentLang = language;
+  applyLanguage();
+}
+
+function toggleLanguage() {
+  currentLang = currentLang === 'en' ? 'id' : 'en';
+  applyLanguage();
 }
