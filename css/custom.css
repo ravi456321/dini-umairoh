@@ -252,7 +252,21 @@ body::after {
 }
 
 .resume-wrap h2 {
-  font-size: 24px;
+  font-size: 20px;
+}
+
+.resume-wrap .date {
+  font-size: 20px;
+}
+
+.resume-wrap .position {
+  font-size: 11px;
+  letter-spacing: 2px;
+}
+
+.resume-wrap p {
+  font-size: 0.95rem;
+  line-height: 1.7;
 }
 
 .services-1 .desc h4 {
